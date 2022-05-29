@@ -1,0 +1,19 @@
+{
+  "name": "quizfightserver",
+  "version": "1.0.0",
+  "description": "Server for QuizFight App for Mobile Application Course UniBo 2022",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alessiodipasquale/QuizFightServer.git"
+  },
+  "author": "Alessio Di Pasquale",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alessiodipasquale/QuizFightServer/issues"
+  },
+  "homepage": "https://github.com/alessiodipasquale/QuizFightServer#readme"
+}
