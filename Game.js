@@ -1,3 +1,5 @@
+const { v4: uuid } = require('uuid');
+
 class Game {
     _id;
     name;

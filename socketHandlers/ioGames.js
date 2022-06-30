@@ -1,5 +1,7 @@
 const { v4: uuid } = require('uuid');
 const gamesManager = require('../gamesManager');
+const Game = require('../Game')
+ 
 const ioGames = (socket) => {
     
     GamesArray = gamesManager.getGames()
@@ -11,10 +13,36 @@ const ioGames = (socket) => {
             socket.join(data.id)
             const game = GamesArray.find(el => el._id == data.id);
             game.players.push({playerName: data.name});
-            socket.to(data.id).emit("joined", data.name)
+            socket.to(game._id).emit("joined", data.name)
             callback(game)
         } catch (err) {
             callback(new Error())
+            console.log(err)
+        }
+    }
+
+    const startGame = async (data, callback) => {
+        try {
+            if (!data.id)
+                throw new Error()
+            
+            const game = GamesArray.find(el => el._id == data.id);
+
+            console.log(game.questions.length)
+            if (game.questions.length !== 0) {
+                question = game.questions.pop()
+                socket.to(data.id).emit('question',question);
+                socket.to(data.id).emit('startTimer');
+                await new Promise(resolve => setTimeout(resolve, 10000));
+                socket.to(data.id).emit('endTimer');
+            }
+            else
+                socket.to(data.id).emit('gameEnded');
+
+            
+        } catch (err) {
+            callback(new Error())
+            console.log(err)
         }
     }
 
@@ -24,6 +52,7 @@ const ioGames = (socket) => {
             callback(results)
         } catch (err) {
             callback(new Error())
+            console.log(err)
         }
     }
 
@@ -34,6 +63,7 @@ const ioGames = (socket) => {
             console.log('Game created.')
             callback(game._id)
         } catch (err) {
+            console.log(err)
             callback(new Error())
         }
     }
@@ -54,6 +84,7 @@ const ioGames = (socket) => {
             callback(game)
         } catch (err) {
             callback(new Error())
+            console.log(err)
         }
     }
 
@@ -62,6 +93,7 @@ const ioGames = (socket) => {
             callback(GamesArray.map(el => el.questions))
          } catch (err) {
             callback(new Error())
+            console.log(err)
          }
     }
 
@@ -74,7 +106,8 @@ const ioGames = (socket) => {
             })
             callback(results)
         } catch (err) {
-            callback(new Error());
+            callback(new Error())
+            console.log(err);
         }
     }
 
@@ -86,5 +119,6 @@ const ioGames = (socket) => {
     socket.on('getJoinableGames',getJoinableGames)
     socket.on('joinGame',joinGame)
     socket.on('getPlayersOfGame',getPlayersOfGame)
+    socket.on('startGame',startGame)
 }
 module.exports = ioGames
