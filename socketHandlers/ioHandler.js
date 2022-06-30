@@ -1,7 +1,9 @@
-const gamesManager = require('./gamesManager')
+const gamesManager = require('../gamesManager')
+const ioGames = require('./ioGames')
 
 const ioHandler = (io) => (socket) => {
-   gamesManager(socket)
+   gamesManager.initialize()
+   ioGames(socket)
 }
 
 module.exports = ioHandler

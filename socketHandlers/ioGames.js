@@ -1,33 +1,18 @@
 const { v4: uuid } = require('uuid');
-const gamesManager = (socket) => {
-    class Game {
-        _id;
-        name;
-        questions;
-        status;
-        players;
-        constructor(id = uuid(), name = '', questions = [], status = 'waiting', players = []) {
-            this._id = id,
-            this.name = name,
-            this.questions = questions,
-            this.status = status,
-            this.players = players
-        }
-    }
-    const GamesArray = [
-        new Game(1,"Partita tra amici", {question: 'domanda',correct: 'risposta',errata1: 'errata1',errata2: 'errata2',errata3: 'errata3'},'waiting'),
-        new Game(2,"Partita tra amici", {question: 'domanda',correct: 'risposta',errata1: 'errata1',errata2: 'errata2',errata3: 'errata3'},'joinable')
-    ]  
-
+const gamesManager = require('../gamesManager');
+const ioGames = (socket) => {
+    
+    GamesArray = gamesManager.getGames()
+    
     const joinGame = async (data, callback) =>  {
         try {
             if (!data.id)
                 throw new Error()
-            //socket.join(data.id)
+            socket.join(data.id)
             const game = GamesArray.find(el => el._id == data.id);
             game.players.push({playerName: data.name});
-           // socket.to(data.id).emit("joined", data.name)
-            callback()
+            socket.to(data.id).emit("joined", data.name)
+            callback(game)
         } catch (err) {
             callback(new Error())
         }
@@ -102,4 +87,4 @@ const gamesManager = (socket) => {
     socket.on('joinGame',joinGame)
     socket.on('getPlayersOfGame',getPlayersOfGame)
 }
-module.exports = gamesManager
+module.exports = ioGames
