@@ -2,6 +2,9 @@ const http = require('http')
 const express = require('express')
 const socketio = require('socket.io')
 const config = require('./config/config');
+const ip = require("ip");
+const gamesManager = require('./gamesManager')
+
 
 config()
 
@@ -16,6 +19,10 @@ app.use(cors());
 const server = http.createServer(app)
 const io = socketio(server)
 
+gamesManager.initialize()
+
 io.on('connection', ioHandler(io))
 
-server.listen(port, () => console.log('Server listening on '+port))
+
+
+server.listen(port, () => console.log('Server listening on http://'+ip.address()+':'+port))

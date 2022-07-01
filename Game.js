@@ -1,13 +1,13 @@
 const { v4: uuid } = require('uuid');
 
 class Game {
-    _id;
+    id;
     name;
     questions;
     status;
     players;
     constructor(id = uuid(), name = '', questions = [], status = 'waiting', players = []) {
-        this._id = id,
+        this.id = id,
         this.name = name,
         this.questions = questions,
         this.status = status,

@@ -1,8 +1,8 @@
-const gamesManager = require('../gamesManager')
 const ioGames = require('./ioGames')
 
 const ioHandler = (io) => (socket) => {
-   gamesManager.initialize()
+   console.log(socket.id);
+   socket.on('disconnect', () => console.log('disconnected'));
    ioGames(socket)
 }
 

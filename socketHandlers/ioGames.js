@@ -7,13 +7,15 @@ const ioGames = (socket) => {
     GamesArray = gamesManager.getGames()
     
     const joinGame = async (data, callback) =>  {
+        console.log('joinGame')
         try {
             if (!data.id)
                 throw new Error()
             socket.join(data.id)
-            const game = GamesArray.find(el => el._id == data.id);
-            game.players.push({playerName: data.name});
-            socket.to(game._id).emit("joined", data.name)
+            const game = GamesArray.find(el => el.id == data.id);
+            game.players.push({id: socket.id/*, playerName: data.name*/});
+            socket.to(game.id).emit("joined", data.name)
+            console.log(socket.id+' joined in '+game.id)
             callback(game)
         } catch (err) {
             callback(new Error())
@@ -22,11 +24,14 @@ const ioGames = (socket) => {
     }
 
     const startGame = async (data, callback) => {
+        console.log('startGame')
         try {
             if (!data.id)
                 throw new Error()
             
-            const game = GamesArray.find(el => el._id == data.id);
+            const game = GamesArray.find(el => el.id == data.id);
+            socket.to(data.id).emit('startGame');
+            await new Promise(resolve => setTimeout(resolve, 200));
 
             console.log(game.questions.length)
             if (game.questions.length !== 0) {
@@ -47,8 +52,9 @@ const ioGames = (socket) => {
     }
 
     const getPlayersOfGame = async (data, callback) => {
+        console.log('getPlayersOfGame')
         try {
-            const results = GamesArray.find(el => el._id == data.id)
+            const results = GamesArray.find(el => el.id == data.id)
             callback(results)
         } catch (err) {
             callback(new Error())
@@ -57,11 +63,12 @@ const ioGames = (socket) => {
     }
 
     const createGame = async (data,callback) => {
+        console.log('createGame')
         try {
             const game = new Game();
             GamesArray.push(game)
             console.log('Game created.')
-            callback(game._id)
+            callback(game.id)
         } catch (err) {
             console.log(err)
             callback(new Error())
@@ -69,18 +76,21 @@ const ioGames = (socket) => {
     }
 
     const configureGame = async (data,callback) => {
+        console.log('configureGame')
+
         try {
             console.log(data)
             if (!data.id || !data.name || !data.questions)
                 throw new Error();
             const id = data.id
-            const game = GamesArray.find(el => el._id == id);
+            const game = GamesArray.find(el => el.id == id);
             if (!game) {
                 throw new Error()
             }
             game.name = data.name
             game.questions = data.questions
             game.status = 'joinable'
+            socket.broadcast.emit('newJoinableGame', game)
             callback(game)
         } catch (err) {
             callback(new Error())
@@ -89,25 +99,29 @@ const ioGames = (socket) => {
     }
 
     const getGames = async (data, callback) => {
+        console.log('getGames')
+
          try{
-            callback(GamesArray.map(el => el.questions))
+            callback(GamesArray)
          } catch (err) {
             callback(new Error())
             console.log(err)
          }
     }
 
-    const getJoinableGames = async (data, callback) => {
+    const getJoinableGames = async (callback) => {
+        console.log('getJoinableGames')
+
         try {
             const games = GamesArray.filter(el => el.status=='joinable')
             results = []
             games.forEach(game => {
-                results.push({id: game._id, name: game.name})
+                results.push({id: game.id, name: game.name})
             })
             callback(results)
         } catch (err) {
-            callback(new Error())
             console.log(err);
+            callback(new Error())
         }
     }
 
