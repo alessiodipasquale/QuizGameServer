@@ -62,7 +62,7 @@ const ioGames = (socket) => {
         }
     }
 
-    const createGame = async (data,callback) => {
+    const createGame = async (callback) => {
         console.log('createGame')
         try {
             const game = new Game();
