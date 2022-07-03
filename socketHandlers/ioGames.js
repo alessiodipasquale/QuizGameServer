@@ -25,6 +25,7 @@ const ioGames = (socket) => {
 
     const startGame = async (data, callback) => {
         console.log('startGame')
+        console.log (data);
         try {
             if (!data.id)
                 throw new Error()
@@ -89,6 +90,7 @@ const ioGames = (socket) => {
             }
             game.name = data.name
             game.questions = data.questions
+            console.log(data.questions)
             game.status = 'joinable'
             socket.broadcast.emit('newJoinableGame', game)
             callback(game)
