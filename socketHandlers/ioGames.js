@@ -4,6 +4,7 @@ const Game = require('../Game')
  
 const ioGames = (socket) => {
     
+    //Può servire in altre chiamate per aggiornare la lista di partite?
     GamesArray = gamesManager.getGames()
     
     const joinGame = async (data, callback) =>  {
@@ -13,13 +14,44 @@ const ioGames = (socket) => {
                 throw new Error()
             socket.join(data.id)
             const game = GamesArray.find(el => el.id == data.id);
-            game.players.push({id: socket.id/*, playerName: data.name*/});
+            game.players.push({id: socket.id, name: data.name});
             socket.to(game.id).emit("joined", data.name)
             console.log(socket.id+' joined in '+game.id)
-            callback(game)
+            callback(data.name)
         } catch (err) {
             callback(new Error())
             console.log(err)
+        }
+    }
+
+    const quitGame = async(callback) => {
+        console.log(socket.id+ ' Disconnected')
+        console.log('quitGame')
+        try {
+            GamesArray.forEach(game => {
+                if(game.admin == socket.id) {
+                    console.log("Delete by admin");
+                    //Avvisi tutti di uscire dalla partita
+                    socket.to(game.id).emit("gameStoppedByAdmin");
+                    //Aggiorno i giochi eliminando quello
+                    GamesArray = GamesArray.filter(el => el.admin != socket.id);
+                    console.log(GamesArray);
+                } else {
+                    game.players.forEach(el => {
+                        if(el.id == socket.id) {
+                            game.players = game.players.filter(el => el.id != socket.id)
+                            playerName = el.name
+                            socket.to(game.id).emit("playerQuitted", playerName);
+                        }
+
+                    });
+                }
+            });
+            console.log(GamesArray);
+           
+        } catch (err) {
+            console.log(err)
+            callback(new Error())
         }
     }
 
@@ -66,9 +98,10 @@ const ioGames = (socket) => {
     const createGame = async (callback) => {
         console.log('createGame')
         try {
-            const game = new Game();
+            const game = new Game(socket.id);
             GamesArray.push(game)
             console.log('Game created.')
+            socket.join(game.id)
             callback(game.id)
         } catch (err) {
             console.log(err)
@@ -81,7 +114,7 @@ const ioGames = (socket) => {
 
         try {
             console.log(data)
-            if (!data.id || !data.name || !data.questions)
+            if (!data.id || !data.name || !data.questions || !data.numberOfPlayers)
                 throw new Error();
             const id = data.id
             const game = GamesArray.find(el => el.id == id);
@@ -89,11 +122,14 @@ const ioGames = (socket) => {
                 throw new Error()
             }
             game.name = data.name
+
+            //controlli su formattazione di questions
             game.questions = data.questions
-            console.log(data.questions)
+
             game.status = 'joinable'
-            socket.broadcast.emit('newJoinableGame', game)
-            callback(game)
+            console.log(game)
+            //socket.broadcast.emit('newJoinableGame', game)
+            callback(game.id)
         } catch (err) {
             callback(new Error())
             console.log(err)
@@ -136,5 +172,7 @@ const ioGames = (socket) => {
     socket.on('joinGame',joinGame)
     socket.on('getPlayersOfGame',getPlayersOfGame)
     socket.on('startGame',startGame)
+    socket.on('disconnect', quitGame);
+
 }
 module.exports = ioGames

@@ -56,6 +56,7 @@ const gamesManager = {
                     ['giusta1', true], ['errata2', false], ['errata3', false], ['errata4', false]
                 ]
             ], 'joinable'));
+
     },
 
     

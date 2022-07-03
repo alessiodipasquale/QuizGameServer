@@ -5,13 +5,17 @@ class Game {
     name;
     questions;
     status;
+    numberOfPlayers;
     players;
-    constructor(id = uuid(), name = '', questions = [], status = 'waiting', players = []) {
-        this.id = id,
-        this.name = name,
-        this.questions = questions,
-        this.status = status,
-        this.players = players
+    admin;
+    constructor(admin,name = '', questions = [], status = 'waiting', players = [], numberOfPlayers = 0) {
+        this.admin = admin;
+        this.id = uuid();
+        this.name = name;
+        this.questions = questions;
+        this.status = status;
+        this.players = players;
+        this.numberOfPlayers = numberOfPlayers;
     }
 }
 
