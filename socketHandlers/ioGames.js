@@ -128,7 +128,7 @@ const ioGames = (socket) => {
 
             game.status = 'joinable'
             console.log(game)
-            //socket.broadcast.emit('newJoinableGame', game)
+            socket.broadcast.emit('newJoinableGame', game)
             callback(game.id)
         } catch (err) {
             callback(new Error())

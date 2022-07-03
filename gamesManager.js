@@ -63,6 +63,10 @@ const gamesManager = {
 
     getGames: () => {
         return GamesArray
+    },
+
+    setGames: (games) => {
+        GamesArray = games;
     }
 }
 
