@@ -4,6 +4,7 @@
   "description": "Server for QuizFight App for Mobile Application Course UniBo 2022",
   "main": "index.js",
   "scripts": {
+    "start":"node index",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "nodemon index"
   },
