@@ -33,30 +33,7 @@ const gamesManager = {
     initialize: () => {
         // GamesArray.push(new Game(1,"Partita tra amici", [{question: 'domanda1',correct: 'risposta',errata1: 'errata1',errata2: 'errata2',errata3: 'errata3'},{question: 'domanda2',correct: 'risposta',errata1: 'errata1',errata2: 'errata2',errata3: 'errata3'}],'waiting'))
         // GamesArray.push(new Game(2,"Partita tra amici", [{question: 'domanda1',correct: 'risposta',errata1: 'errata1',errata2: 'errata2',errata3: 'errata3'}, {question: 'domanda2',correct: 'risposta',errata1: 'errata1',errata2: 'errata2',errata3: 'errata3'}],'joinable'))
-        GamesArray.push(
-            new Game("1", "Partita tra amici", [
-                [
-                    'domanda1',
-                    ['errata1', false], ['errata2', false], ['errata3', false], ['giusta4', true]
-                ], 
-                [
-                    'domanda2', 
-                    ['errata1', false], ['giusta2', true], ['errata3', false], ['errata4', false]
-                ]
-            ], 'waiting'));
-
-        GamesArray.push(
-            new Game("2", "Partita tra amici_2", [
-                [
-                    'question1', 
-                    ['errata1', false], ['errata2', false], ['giusta3', true], ['errata4', false]
-                ], 
-                [
-                    'question2', 
-                    ['giusta1', true], ['errata2', false], ['errata3', false], ['errata4', false]
-                ]
-            ], 'joinable'));
-
+       
     },
 
     

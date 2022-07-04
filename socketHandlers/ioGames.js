@@ -19,8 +19,8 @@ const ioGames = (socket) => {
             console.log(socket.id+' joined in '+game.id)
             callback(data.name)
         } catch (err) {
-            callback(new Error())
             console.log(err)
+            callback(new Error())
         }
     }
 
@@ -63,6 +63,9 @@ const ioGames = (socket) => {
                 throw new Error()
             
             const game = GamesArray.find(el => el.id == data.id);
+            game.status = 'playing';
+            socket.broadcast.emit('gameNowPlaying',game.name);
+
             socket.to(data.id).emit('startGame');
             await new Promise(resolve => setTimeout(resolve, 200));
 
@@ -79,8 +82,8 @@ const ioGames = (socket) => {
 
             
         } catch (err) {
-            callback(new Error())
             console.log(err)
+            callback(new Error())
         }
     }
 
@@ -90,8 +93,8 @@ const ioGames = (socket) => {
             const results = GamesArray.find(el => el.id == data.id)
             callback(results)
         } catch (err) {
-            callback(new Error())
             console.log(err)
+            callback(new Error())
         }
     }
 
@@ -113,7 +116,6 @@ const ioGames = (socket) => {
         console.log('configureGame')
 
         try {
-            console.log(data)
             if (!data.id || !data.name || !data.questions || !data.numberOfPlayers)
                 throw new Error();
             const id = data.id
@@ -123,7 +125,13 @@ const ioGames = (socket) => {
             }
             game.name = data.name
 
+            console.log(data.questions)
+
             //controlli su formattazione di questions
+            data.questions.forEach(item => {
+                if(!item.question || !item.answer1 || !item.answer2 || !item.answer3 || !item.answer4 || !item.correctIndex)
+                    throw new Error();
+            });
             game.questions = data.questions
 
             game.status = 'joinable'
@@ -131,8 +139,8 @@ const ioGames = (socket) => {
             socket.broadcast.emit('newJoinableGame', game)
             callback(game.id)
         } catch (err) {
-            callback(new Error())
             console.log(err)
+            callback(new Error())
         }
     }
 
@@ -142,8 +150,8 @@ const ioGames = (socket) => {
          try{
             callback(GamesArray)
          } catch (err) {
-            callback(new Error())
             console.log(err)
+            callback(new Error())
          }
     }
 
