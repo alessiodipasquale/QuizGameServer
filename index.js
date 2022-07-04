@@ -21,7 +21,6 @@ const io = socketio(server)
 
 gamesManager.initialize()
 
-console.log("prima di connection " + io)
 io.on('connection', ioHandler(io))
 
 

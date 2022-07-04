@@ -182,5 +182,7 @@ const ioGames = (socket) => {
     socket.on('startGame',startGame)
     socket.on('disconnect', quitGame);
 
+
+    socket.on('timer', ()=> socket.broadcast.emit('startTimer'));
 }
 module.exports = ioGames
