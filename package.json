@@ -4,7 +4,7 @@
   "description": "Server for QuizFight App for Mobile Application Course UniBo 2022",
   "main": "index.js",
   "scripts": {
-    "start":"node index",
+    "start": "node index",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "nodemon index"
   },
@@ -21,6 +21,7 @@
   "dependencies": {
     "body-parser": "^1.20.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "http": "^0.0.1-security",
     "ip": "^1.1.8",
@@ -28,7 +29,6 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "dotenv": "^16.0.1",
     "nodemon": "^2.0.16"
   }
 }
