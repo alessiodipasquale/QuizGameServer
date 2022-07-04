@@ -67,7 +67,7 @@ const ioGames = (socket) => {
             socket.broadcast.emit('gameNowPlaying',game.name);
 
             socket.to(data.id).emit('startGame');
-            await new Promise(resolve => setTimeout(resolve, 200));
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
             console.log(game.questions.length)
             if (game.questions.length !== 0) {
