@@ -66,7 +66,7 @@ const ioGames = (socket) => {
             game.status = 'playing';
             game.currentQuestion = 0;
             socket.broadcast.emit('gameNowPlaying',game.name);
-            callback(data.id)
+            callback(game.currentQuestion+1)
 
             //socket.to(data.id).emit('startGame');
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -79,9 +79,39 @@ const ioGames = (socket) => {
                 socket.to(data.id).emit('startTimer');
                 await new Promise(resolve => setTimeout(resolve, 10000));
                 socket.to(data.id).emit('endTimer');
-
             }
             else
+                socket.to(data.id).emit('gameEnded');
+
+            
+        } catch (err) {
+            console.log(err)
+            callback(new Error())
+        }
+    }
+
+    const nextQuestion = async (data, callback) => {
+        console.log('nextQuestion')
+        console.log (data);
+        try {
+            if (!data.id)
+                throw new Error()
+            
+            const game = GamesArray.find(el => el.id == data.id);
+            callback(game.currentQuestion+1)
+
+            //socket.to(data.id).emit('startGame');
+            console.log(game.questions.length)
+            if (game.currentQuestion <= game.questions.length) {
+                question = game.questions[game.currentQuestion]
+                socket.to(data.id).emit('question',question);
+                game.currentQuestion = game.currentQuestion+1; 
+                socket.to(data.id).emit('startTimer');
+                await new Promise(resolve => setTimeout(resolve, 10000));
+                socket.to(data.id).emit('endTimer');
+            }
+            else
+                GamesArray = GamesArray.filter(el => el.id != data.id);
                 socket.to(data.id).emit('gameEnded');
 
             
@@ -107,10 +137,14 @@ const ioGames = (socket) => {
             question = game.questions.find(el => el.question == data.actualQuestion);
             console.log(question);
             correct = question.correctIndex == data.responseIndex
+            let player;
             if(correct) {
                 player = game.players.find(el => el.id == socket.id);
                 player.points +=1;
             }
+
+            socket.to(data.id).emit('playerAnswered', game);
+
             callback(correct)
         } catch (err) {
             console.log(err)
@@ -119,9 +153,11 @@ const ioGames = (socket) => {
     }
 
 
-    const getPlayersOfGame = async (data, callback) => {
-        console.log('getPlayersOfGame')
+    const getGameInfo = async (data, callback) => {
+        console.log('getGameInfo')
         try {
+            if(!data.id)
+                throw new Error();
             const results = GamesArray.find(el => el.id == data.id)
             callback(results)
         } catch (err) {
@@ -210,8 +246,9 @@ const ioGames = (socket) => {
     socket.on('configureGame',configureGame)
     socket.on('getJoinableGames',getJoinableGames)
     socket.on('joinGame',joinGame)
-    socket.on('getPlayersOfGame',getPlayersOfGame)
+    socket.on('getGameInfo',getGameInfo)
     socket.on('startGame',startGame)
+    socket.on('nextQuestion',nextQuestion)
     socket.on('sendAnswer',sendAnswer)
     socket.on('disconnect', quitGame);
 
