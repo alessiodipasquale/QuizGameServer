@@ -33,9 +33,9 @@ const ioGames = (socket) => {
                     console.log("Delete by admin");
                     //Avvisi tutti di uscire dalla partita
                     socket.to(game.id).emit("gameStoppedByAdmin");
+                    socket.broadcast.emit("gameDeletedByAdmin", {id: game.id, name: game.name});
                     //Aggiorno i giochi eliminando quello
                     GamesArray = GamesArray.filter(el => el.admin != socket.id);
-                    console.log(GamesArray);
                 } else {
                     game.players.forEach(el => {
                         if(el.id == socket.id) {
@@ -101,8 +101,8 @@ const ioGames = (socket) => {
             callback(game.currentQuestion+1)
 
             //socket.to(data.id).emit('startGame');
-            console.log(game.questions.length)
-            if (game.currentQuestion <= game.questions.length) {
+            console.log(game.currentQuestion)
+            if (game.currentQuestion < game.questions.length) {
                 question = game.questions[game.currentQuestion]
                 socket.to(data.id).emit('question',question);
                 game.currentQuestion = game.currentQuestion+1; 
@@ -110,10 +110,13 @@ const ioGames = (socket) => {
                 await new Promise(resolve => setTimeout(resolve, 10000));
                 socket.to(data.id).emit('endTimer');
             }
-            else
+            else {
+                console.log("Game Ended");
+                console.log(game.players)
                 GamesArray = GamesArray.filter(el => el.id != data.id);
                 socket.to(data.id).emit('gameEnded');
-
+                socket.emit('gameEnded');
+            }
             
         } catch (err) {
             console.log(err)
@@ -133,6 +136,8 @@ const ioGames = (socket) => {
             if(!data.id || !data.responseIndex || !data.actualQuestion)
                 throw new Error();
             const game = GamesArray.find(el => el.id == data.id);
+            if(!game)
+                throw new Error()
             console.log(game.questions)
             question = game.questions.find(el => el.question == data.actualQuestion);
             console.log(question);
@@ -191,6 +196,13 @@ const ioGames = (socket) => {
             if (!game) {
                 throw new Error()
             }
+
+            //Controllo se esiste una partita con nome uguale
+            GamesArray.forEach(game => {
+                if (game.name == data.name)
+                    throw new Error();
+            })
+
             game.name = data.name
 
             console.log(data.questions)
@@ -205,14 +217,14 @@ const ioGames = (socket) => {
             game.status = 'joinable'
             console.log(game)
             socket.broadcast.emit('newJoinableGame', game)
-            callback(game.id)
+            callback({id: game.id})
         } catch (err) {
             console.log(err)
             callback(new Error())
         }
     }
 
-    const getGames = async (data, callback) => {
+    const getGames = async (callback) => {
         console.log('getGames')
 
          try{
