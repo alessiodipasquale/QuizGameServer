@@ -14,7 +14,7 @@ const ioGames = (socket) => {
                 throw new Error()
             socket.join(data.id)
             const game = GamesArray.find(el => el.id == data.id);
-            game.players.push({id: socket.id, name: data.name, points: 0});
+            game.players.push({id: socket.id, name: data.name, points: 0, answerCount:0, lastAnswer: null});
             socket.to(game.id).emit("joined", data.name)
             console.log(socket.id+' joined in '+game.id)
             callback(data.name)
@@ -141,12 +141,15 @@ const ioGames = (socket) => {
             console.log(game.questions)
             question = game.questions.find(el => el.question == data.actualQuestion);
             console.log(question);
-            correct = question.correctIndex == data.responseIndex
+            correct = (question.correctIndex == data.responseIndex)
+            console.log(correct)
             let player;
             if(correct) {
                 player = game.players.find(el => el.id == socket.id);
                 player.points +=1;
             }
+            player.lastAnswer = correct;
+            player.answerCount += 1;
 
             socket.to(data.id).emit('playerAnswered', game);
 
