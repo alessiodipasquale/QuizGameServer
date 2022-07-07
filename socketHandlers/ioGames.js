@@ -14,9 +14,10 @@ const ioGames = (socket) => {
                 throw new Error()
             socket.join(data.id)
             const game = GamesArray.find(el => el.id == data.id);
-            game.players.push({id: socket.id, name: data.name, points: 0, answerCount:0, lastAnswer: null});
+            game.players.push({id: socket.id, name: data.name, points: 0, answerCount:0, lastAnswer: false});
             socket.to(game.id).emit("joined", data.name)
             console.log(socket.id+' joined in '+game.id)
+            console.log(game.players)
             callback(data.name)
         } catch (err) {
             console.log(err)
@@ -71,14 +72,16 @@ const ioGames = (socket) => {
             //socket.to(data.id).emit('startGame');
             await new Promise(resolve => setTimeout(resolve, 1000));
 
-            console.log(game.questions.length)
-            if (game.questions.length !== 0) {
+            console.log("Current:" + game.currentQuestion)
+            console.log("Length:" + game.questions.length)
+            if (game.currentQuestion < game.questions.length) {
                 question = game.questions[game.currentQuestion]
                 socket.to(data.id).emit('question',question);
                 game.currentQuestion = game.currentQuestion+1; 
                 socket.to(data.id).emit('startTimer');
                 await new Promise(resolve => setTimeout(resolve, 10000));
                 socket.to(data.id).emit('endTimer');
+                console.log("Timer ended");
             }
             else
                 socket.to(data.id).emit('gameEnded');
@@ -101,7 +104,8 @@ const ioGames = (socket) => {
             callback(game.currentQuestion+1)
 
             //socket.to(data.id).emit('startGame');
-            console.log(game.currentQuestion)
+            console.log("Current:" + game.currentQuestion)
+            console.log("Length:" + game.questions.length)
             if (game.currentQuestion < game.questions.length) {
                 question = game.questions[game.currentQuestion]
                 socket.to(data.id).emit('question',question);
@@ -138,18 +142,20 @@ const ioGames = (socket) => {
             const game = GamesArray.find(el => el.id == data.id);
             if(!game)
                 throw new Error()
-            console.log(game.questions)
+            //console.log(game.questions)
             question = game.questions.find(el => el.question == data.actualQuestion);
-            console.log(question);
+           // console.log(question);
             correct = (question.correctIndex == data.responseIndex)
-            console.log(correct)
+            //console.log(correct)
             let player;
+            player = game.players.find(el => el.id == socket.id);
             if(correct) {
-                player = game.players.find(el => el.id == socket.id);
-                player.points +=1;
+                player.points = player.points + 1;
+                console.log("Incremento di uno il punteggio")
             }
             player.lastAnswer = correct;
-            player.answerCount += 1;
+            player.answerCount =  player.answerCount + 1;
+            console.log(player);
 
             socket.to(data.id).emit('playerAnswered', game);
 
