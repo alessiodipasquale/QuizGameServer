@@ -84,7 +84,7 @@ const ioGames = (socket) => {
                 console.log("Timer ended");
             }
             else
-                socket.to(data.id).emit('gameEnded');
+                socket.to(data.id).emit('gameEnded', game.players);
 
             
         } catch (err) {
@@ -118,8 +118,8 @@ const ioGames = (socket) => {
                 console.log("Game Ended");
                 console.log(game.players)
                 GamesArray = GamesArray.filter(el => el.id != data.id);
-                socket.to(data.id).emit('gameEnded');
-                socket.emit('gameEnded');
+                socket.to(data.id).emit('gameEnded', game.players);
+                socket.emit('gameEnded', game.players);
             }
             
         } catch (err) {
