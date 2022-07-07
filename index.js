@@ -18,6 +18,8 @@ app.use(cors());
 
 const server = http.createServer(app)
 const io = socketio(server)
+io.eio.pingTimeout = 120000; // 2 minutes
+io.eio.pingInterval = 5000;  // 5 seconds
 
 gamesManager.initialize()
 
