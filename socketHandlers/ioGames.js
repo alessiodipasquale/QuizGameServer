@@ -144,22 +144,32 @@ const ioGames = (socket) => {
                 throw new Error()
             //console.log(game.questions)
             question = game.questions.find(el => el.question == data.actualQuestion);
-           // console.log(question);
-            correct = (question.correctIndex == data.responseIndex)
-            //console.log(correct)
-            let player;
-            player = game.players.find(el => el.id == socket.id);
-            if(correct) {
-                player.points = player.points + 1;
-                console.log("Incremento di uno il punteggio")
+
+            let indexOfQuestion = game.questions.indexOf(question);
+
+            console.log("indexOfQuestion: "+indexOfQuestion)
+            console.log("game.currentQuestion: "+ (game.currentQuestion-1))
+
+            if(indexOfQuestion == game.currentQuestion-1) {
+            // console.log(question);
+                correct = (question.correctIndex == data.responseIndex)
+                //console.log(correct)
+                let player;
+                player = game.players.find(el => el.id == socket.id);
+                if(correct) {
+                    player.points = player.points + 1;
+                    console.log("Incremento di uno il punteggio")
+                }
+                player.lastAnswer = correct;
+                player.answerCount =  player.answerCount + 1;
+                console.log(player);
+
+                socket.to(data.id).emit('playerAnswered', game);
+                callback(correct)
+            } else {
+                console.log("Not actual question, skipped")
             }
-            player.lastAnswer = correct;
-            player.answerCount =  player.answerCount + 1;
-            console.log(player);
 
-            socket.to(data.id).emit('playerAnswered', game);
-
-            callback(correct)
         } catch (err) {
             console.log(err)
             callback(new Error())
