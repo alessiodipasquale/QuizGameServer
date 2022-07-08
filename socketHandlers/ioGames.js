@@ -165,7 +165,8 @@ const ioGames = (socket) => {
                 console.log(player);
 
                 socket.to(data.id).emit('playerAnswered', game);
-                callback(correct)
+                console.log([correct, question.correctIndex])
+                callback([correct, question.correctIndex])
             } else {
                 console.log("Not actual question, skipped")
             }
