@@ -118,7 +118,12 @@ const ioGames = (socket) => {
                 console.log("Game Ended");
                 console.log(game.players)
                 GamesArray = GamesArray.filter(el => el.id != data.id);
-                socket.to(data.id).emit('gameEnded', game.players);
+                players = game.players.sort((a,b) => b.points - a.points);
+                for (let i = 0;i < players.length; i++) {
+                    players[i].position = i+1;
+                }
+                console.log(players);
+                socket.to(data.id).emit('gameEnded',{players: players, numberOfQuestions: game.questions.length});
                 socket.emit('gameEnded', game.players);
             }
             
@@ -136,7 +141,7 @@ const ioGames = (socket) => {
         */
         console.log('sendAnswer')
         try {
-            console.log(data)
+            console.log(data)   
             if(!data.id || !data.responseIndex || !data.actualQuestion)
                 throw new Error();
             const game = GamesArray.find(el => el.id == data.id);
@@ -245,7 +250,7 @@ const ioGames = (socket) => {
     }
 
     const pushNewQuestion = async (data, callback) => {
-        console.log(data)
+        console.log(data    )
         console.log('pushNewQuestion')
         try {
             if (!data.id || !data.question || !data.answer1 || !data.answer2 || !data.answer3 || !data.answer4 || !data.correctIndex)
