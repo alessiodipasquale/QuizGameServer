@@ -244,6 +244,26 @@ const ioGames = (socket) => {
         }
     }
 
+    const pushNewQuestion = async (data, callback) => {
+        console.log(data)
+        console.log('pushNewQuestion')
+        try {
+            if (!data.id || !data.question || !data.answer1 || !data.answer2 || !data.answer3 || !data.answer4 || !data.correctIndex)
+                throw new Error();
+            const id = data.id
+            const game = GamesArray.find(el => el.id == id);
+            if (!game) {
+                throw new Error()
+            }
+            game.questions.push({question: data.question, answer1: data.answer1, answer2: data.answer2, answer3: data.answer3, answer4: data.answer4, correctIndex: data.correctIndex })
+            console.log(game.questions)
+            callback(game.id)
+        } catch (err) {
+            console.log(err);
+            callback(new Error());
+        }
+    }
+
     const getGames = async (callback) => {
         console.log('getGames')
 
@@ -278,6 +298,7 @@ const ioGames = (socket) => {
     socket.on('configureGame',configureGame)
     socket.on('getJoinableGames',getJoinableGames)
     socket.on('joinGame',joinGame)
+    socket.on('pushNewQuestion',pushNewQuestion)
     socket.on('getGameInfo',getGameInfo)
     socket.on('startGame',startGame)
     socket.on('nextQuestion',nextQuestion)
