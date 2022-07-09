@@ -32,6 +32,7 @@ const ioGames = (socket) => {
             GamesArray.forEach(game => {
                 if(game.admin == socket.id) {
                     console.log("Delete by admin");
+                    game.status = 'playing';
                     //Avvisi tutti di uscire dalla partita
                     socket.to(game.id).emit("gameStoppedByAdmin");
                     socket.broadcast.emit("gameDeletedByAdmin", {id: game.id, name: game.name});
