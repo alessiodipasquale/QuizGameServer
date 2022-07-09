@@ -308,7 +308,7 @@ const ioGames = (socket) => {
     socket.on('startGame',startGame)
     socket.on('nextQuestion',nextQuestion)
     socket.on('sendAnswer',sendAnswer)
-    socket.on('disconnectFromGame', quitGame);
+    socket.on('disconnect', quitGame);
 
 
     socket.on('timer', ()=> socket.broadcast.emit('startTimer'));
